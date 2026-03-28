@@ -1,0 +1,5 @@
+[
+  {"name": "ET Markets", "type": "beginner", "description": "Guided investing starter pack."},
+  {"name": "ET Prime", "type": "advanced", "description": "Premium deep-dive market intelligence."},
+  {"name": "ET Wealth", "type": "general", "description": "Personal finance guidance."}
+]
