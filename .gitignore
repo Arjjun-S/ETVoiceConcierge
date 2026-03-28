@@ -12,6 +12,7 @@ venv/
 ENV/
 .env
 .env.*
+!.env.example
 *.env
 
 # Dependency caches
