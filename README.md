@@ -23,40 +23,38 @@ Production-ready scaffold for a real-time voice concierge that answers Exotel ca
 ## Repo Structure
 ```
 et-voice-concierge/
-├── backend/
-│   ├── main.py                 # FastAPI app entry
-│   ├── exotel_webhook.py       # /voice webhook, returns XML
-│   ├── websocket_server.py     # /audio-stream WebSocket handler
-│   ├── agents/
-│   │   ├── orchestrator.py
-│   │   ├── conversation_agent.py
-│   │   ├── profiling_agent.py
-│   │   ├── recommendation_agent.py
-│   │   ├── action_agent.py
-│   │   └── memory_agent.py
-│   ├── services/
-│   │   ├── stt_service.py
-│   │   ├── tts_service.py
-│   │   ├── llm_service.py
-│   ├── tools/
-│   │   ├── et_products.json
-│   │   ├── send_sms.py
-│   │   └── send_whatsapp.py
-│   ├── config.py
-│   ├── requirements.txt
-│   └── .env.example
-└── README.md
+├── main.py                 # FastAPI app entry
+├── exotel_webhook.py       # /voice webhook, returns XML
+├── websocket_server.py     # /audio-stream WebSocket handler
+├── agents/
+│   ├── orchestrator.py
+│   ├── conversation_agent.py
+│   ├── profiling_agent.py
+│   ├── recommendation_agent.py
+│   ├── action_agent.py
+│   └── memory_agent.py
+├── services/
+│   ├── stt_service.py
+│   ├── tts_service.py
+│   ├── llm_service.py
+├── tools/
+│   ├── et_products.json
+│   ├── send_sms.py
+│   └── send_whatsapp.py
+├── config.py
+├── requirements.txt
+├── .env.example
+└── Procfile
 ```
 
 ## Quickstart
 1. Install Python 3.11+ and `uvicorn` (comes via requirements).
 2. Copy env template:
    ```bash
-   cp backend/.env.example backend/.env
+   cp .env.example .env
    ```
 3. Install deps:
    ```bash
-   cd backend
    python -m venv .venv && source .venv/bin/activate
    pip install -r requirements.txt
    ```
