@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 from config import get_settings
 from exotel_webhook import router as exotel_router
 from websocket_server import router as websocket_router
+from agents.orchestrator import run_agent_pipeline
 
 settings = get_settings()
 
@@ -21,6 +23,10 @@ app.include_router(exotel_router)
 app.include_router(websocket_router)
 
 
+class TestInput(BaseModel):
+    text: str
+
+
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok", "service": "et-voice-concierge"}
@@ -29,3 +35,9 @@ async def health() -> dict[str, str]:
 @app.get("/")
 async def index() -> dict[str, str]:
     return {"message": "ET Voice Concierge is running", "websocket": "/audio-stream"}
+
+
+@app.post("/test")
+async def test_endpoint(body: TestInput) -> dict[str, str]:
+    response = await run_agent_pipeline(user_text=body.text, call_sid="test_user")
+    return {"response": response}
