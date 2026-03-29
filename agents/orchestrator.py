@@ -1,10 +1,6 @@
-from agents import conversation_agent, profiling_agent, recommendation_agent, action_agent, memory_agent
+from agent import run_agent_pipeline as run_concierge_pipeline
 
 
 async def run_agent_pipeline(user_text: str, call_sid: str | None = None) -> str:
-    conversation = await conversation_agent.converse(user_text)
-    profile = await profiling_agent.extract_profile(conversation)
-    recommendations = await recommendation_agent.recommend(profile)
-    action_result = await action_agent.execute(recommendations, profile)
-    await memory_agent.persist(call_sid=call_sid, profile=profile, conversation=conversation)
-    return action_result
+    user_id = call_sid or "test_user"
+    return await run_concierge_pipeline(user_id=user_id, text=user_text)

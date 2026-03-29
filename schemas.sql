@@ -16,11 +16,13 @@ create table if not exists calls (
   ended_at timestamp
 );
 
-create table if not exists conversations (
+-- Reset conversations to memory-friendly schema
+drop table if exists conversations cascade;
+create table conversations (
   id uuid primary key default gen_random_uuid(),
-  call_id uuid references calls(id),
-  user_text text,
-  ai_text text,
+  user_id text,
+  role text,
+  content text,
   created_at timestamp default now()
 );
 
