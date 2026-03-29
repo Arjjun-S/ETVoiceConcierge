@@ -34,7 +34,7 @@ async def health() -> dict[str, str]:
 
 @app.get("/")
 async def index() -> dict[str, str]:
-    return {"message": "ET Voice Concierge is running", "websocket": "/audio-stream"}
+    return {"message": "ET Voice Concierge is running 🚀"}
 
 
 @app.post("/test")
