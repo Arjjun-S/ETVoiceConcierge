@@ -8,6 +8,15 @@ settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
+def _extract_content(data: Dict[str, Any]) -> str:
+    choices = data.get("choices", [])
+    if not choices:
+        return ""
+
+    message = choices[0].get("message", {})
+    return (message.get("content", "") or "").strip()
+
+
 def _headers() -> Dict[str, str]:
     headers = {
         "Authorization": f"Bearer {settings.openrouter_api_key}",
@@ -31,63 +40,32 @@ async def _call_openrouter(payload: Dict[str, Any]) -> Dict[str, Any]:
         return response.json()
 
 
-async def _fallback_reasoning(messages: List[Dict[str, Any]]) -> str:
-    fallback_model = "nvidia/nemotron-3-nano-30b-a3b:free"
-
-    try:
-        first = await _call_openrouter(
-            {
-                "model": fallback_model,
-                "messages": messages,
-                "reasoning": {"enabled": True},
-            }
-        )
-        first_msg = first.get("choices", [{}])[0].get("message", {})
-        if not first_msg:
-            return ""
-
-        chained_messages: List[Dict[str, Any]] = messages + [
-            {
-                "role": "assistant",
-                "content": first_msg.get("content"),
-                "reasoning_details": first_msg.get("reasoning_details"),
-            },
-            {
-                "role": "user",
-                "content": "Are you sure? Think carefully and finalize the answer.",
-            },
-        ]
-
-        second = await _call_openrouter(
-            {
-                "model": fallback_model,
-                "messages": chained_messages,
-                "reasoning": {"enabled": True},
-            }
-        )
-        second_msg = second.get("choices", [{}])[0].get("message", {})
-        return second_msg.get("content") or first_msg.get("content") or ""
-    except Exception as exc:  # pragma: no cover - network failure path
-        logger.error("Fallback OpenRouter call failed: %s", exc)
-        return ""
+async def _call_with_model(model: str, messages: List[Dict[str, Any]]) -> str:
+    payload = {
+        "model": model,
+        "messages": messages,
+        "temperature": 0.3,
+    }
+    data = await _call_openrouter(payload)
+    return _extract_content(data)
 
 
 async def chat_completion(messages: List[Dict[str, Any]]) -> str:
-    payload = {
-        "model": "qwen/qwen3-next-80b-a3b-instruct:free",
-        "messages": messages,
-        "temperature": 0.4,
-    }
+    models = [
+        settings.openrouter_model,
+        settings.openrouter_fallback_model,
+        "meta-llama/llama-3.3-70b-instruct:free",
+    ]
 
-    try:
-        data = await _call_openrouter(payload)
-        choices = data.get("choices", [])
-        if choices:
-            message = choices[0].get("message", {})
-            content = message.get("content", "") or ""
+    for model in models:
+        if not model:
+            continue
+
+        try:
+            content = await _call_with_model(model, messages)
             if content:
                 return content
-    except Exception as exc:  # pragma: no cover - network failure path
-        logger.error("Primary OpenRouter call failed: %s", exc)
+        except Exception as exc:  # pragma: no cover - network failure path
+            logger.error("OpenRouter call failed for model %s: %s", model, exc)
 
-    return await _fallback_reasoning(messages)
+    return ""

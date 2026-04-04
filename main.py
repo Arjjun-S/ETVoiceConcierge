@@ -9,7 +9,7 @@ from agents.orchestrator import run_agent_pipeline
 
 settings = get_settings()
 
-app = FastAPI(title="ET Voice Concierge", version="0.1.0")
+app = FastAPI(title="Real Estate Voice Concierge", version="0.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,12 +29,12 @@ class TestInput(BaseModel):
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok", "service": "et-voice-concierge"}
+    return {"status": "ok", "service": "real-estate-voice-concierge"}
 
 
 @app.get("/")
 async def index() -> dict[str, str]:
-    return {"message": "ET Voice Concierge is running 🚀"}
+    return {"message": "Real Estate Voice Concierge is running"}
 
 
 @app.post("/test")

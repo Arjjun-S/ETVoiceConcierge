@@ -33,10 +33,11 @@ def save_message(user_id: str, role: str, content: str) -> None:
         return
 
     try:
+        headers = _auth_headers()
+        headers["Prefer"] = "return=minimal"
         resp = _client.post(
             f"{_rest_base}/conversations",
-            headers=_auth_headers(),
-            params={"prefer": "return=minimal"},
+            headers=headers,
             json={"user_id": user_id, "role": role, "content": content},
         )
         resp.raise_for_status()
